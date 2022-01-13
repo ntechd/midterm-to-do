@@ -4,25 +4,25 @@ const moviesArr = ['watch', 'see', 'movie', 'theater', 'cinema', 'drama', 'opera
 const restaurantsArr = ['dine', 'lunch', 'eat', 'dinner', 'brunch', 'breakfast', 'snack','teatime', 'cafe'];
 
 function filterShop(query) {
-    return shopArr.filter( function(el){
+    return productsArr.filter( function(el){
       return query.toLowerCase().includes(el)
     })
   }
   
   function filterRead(query) {
-    return readArr.filter( function(el){
+    return booksArr.filter( function(el){
       return query.toLowerCase().includes(el)
     })
   }
   
   function filterMovie(query) {
-    return movieArr.filter( function(el){
+    return moviesArr.filter( function(el){
       return query.toLowerCase().includes(el)
     })
   }
   
   function filterEat(query) {
-    return eatArr.filter( function(el){
+    return restaurantsArr.filter( function(el){
       return query.toLowerCase().includes(el)
     })
   }

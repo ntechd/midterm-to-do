@@ -1,0 +1,38 @@
+.popup-container {
+  width: 30%;
+  align-self: center;
+}
+
+.attributes-style {
+  padding-top: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.status-text {
+  color: red;
+  background-color: pink;
+  border: none;
+}
+
+.title-text {
+  font-weight: bold;
+  border: none;
+  font-size: 2em;
+}
+
+.update-btn {
+  /* border: none; */
+  /* background-color: transparent; */
+  font-weight: bold;
+}
+
+.fa-clock {
+  color: gray;
+  padding-right: 0.2em;
+}
+
+.fa-tasks {
+  color: gray;
+  padding-right: 0.2em;
+}

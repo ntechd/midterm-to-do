@@ -4,13 +4,12 @@ const omdbApi = require('omdb-client');
 const key =  process.env.OMDB_API_KEY;
 
 //Categorizes based on the OMDB API
-const isMovie = function (taskTitle, taskDesc) {
+const isMovie = function (taskTitle) {
     taskTitle = taskTitle.toLowerCase().trim();
-    taskDesc = taskDesc.toLowerCase().trim();
 
 const params = {
     apiKey: key,
-    query: 'You'
+    query: 'taskTitle'
 }
 return new Promise ((resolve,reject) => {
     omdbApi.search(params, function(err, data) {
@@ -37,9 +36,8 @@ return new Promise ((resolve,reject) => {
 }
 
 // Function to categorize based on OMDB API.
-const isSeries = function (taskTitle, taskDesc) {
+const isSeries = function (taskTitle) {
   taskTitle = taskTitle.toLowerCase().trim();
-  taskDesc = taskDesc.toLowerCase().trim();
 
   const params = {
     apiKey: key,
@@ -70,3 +68,8 @@ const isSeries = function (taskTitle, taskDesc) {
   })
 
 }
+
+module.exports = {
+  isSeries,
+  isMovie
+};

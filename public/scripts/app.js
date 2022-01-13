@@ -1,6 +1,10 @@
-// Client facing scripts here
-window.onload=function(){
+// Hard Code
+const productsArr = ['buy', 'shop', 'acquire', 'purchase', 'obtain', 'stock up'];
+const booksArr = ['study', 'scan', 'read', 'perusal', 'browse'];
+const moviesArr = ['watch', 'see', 'movie', 'theater', 'cinema', 'drama', 'opera', 'avengers', 'spiderman', ''];
+const restaurantsArr = ['dine', 'lunch', 'eat', 'dinner', 'brunch', 'breakfast', 'snack','teatime', 'cafe', 'mcdonalds', 'tim', 'wendys'];
 
+// Client facing scripts here
 const todoInput = document.querySelector(".todo-input");
 const todoButton = document.querySelector(".todo-button");
 const moviesList = document.querySelector(".film-ul");
@@ -37,6 +41,8 @@ function addTodo(e) {
     todoInput.value = "";
 
 
+
+
     //Create Completed Button
     const completedButton = document.createElement("button");
     completedButton.innerHTML = `<i class="fas fa-check"></i>`;
@@ -55,13 +61,13 @@ function addTodo(e) {
     
     //attach final Todo
 
-    if (newTodo.innerText.split(" ")[0] === 'read' || newTodo.innerText.split(" ")[0] === 'Read') {
+    if (booksArr.includes(newTodo.innerText.split(" ")[0])) {
         booksList.appendChild(todoDiv);
-    } else if (newTodo.innerText.split(" ")[0] === 'watch' || newTodo.innerText.split(" ")[0] === 'watch' || newTodo.innerText.split(" ")[0] === 'see' || newTodo.innerText.split(" ")[0] === 'See') {
+    } else if (moviesArr.includes(newTodo.innerText.split(" ")[0])) {
         moviesList.appendChild(todoDiv);
-    } else if (newTodo.innerText.split(" ")[0] === 'try' || newTodo.innerText.split(" ")[0] === 'Try' || newTodo.innerText.split(" ")[0] === 'eat' || newTodo.innerText.split(" ")[0] === 'Eat') {
+    } else if (restaurantsArr.includes(newTodo.innerText.split(" ")[0])) {
         restaurantsList.appendChild(todoDiv);
-    } else if (newTodo.innerText.split(" ")[0] === 'buy' || newTodo.innerText.split(" ")[0] === 'Buy') {
+    } else if (productsArr.includes(newTodo.innerText.split(" ")[0])) {
         productsList.appendChild(todoDiv);
     } else {
         productsList.appendChild(todoDiv);
@@ -142,4 +148,3 @@ function saveLocalTodos(todo) {
       todoList.appendChild(todoDiv);
     });
   }
-}

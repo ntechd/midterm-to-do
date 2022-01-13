@@ -19,10 +19,13 @@
     "ejs": "^2.6.2",
     "express": "^4.17.1",
     "google-books-search": "^0.3.1",
+    "moment": "^2.29.1",
     "morgan": "^1.9.1",
     "omdb-client": "^2.0.0",
     "pg": "^8.5.0",
     "pg-native": "^3.0.0",
+    "require.js": "^1.0.0",
+    "requirejs": "^2.3.6",
     "sass": "^1.35.1",
     "yelp-fusion": "^3.0.0"
   },

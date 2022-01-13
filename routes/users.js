@@ -5,11 +5,13 @@
  * See: https://expressjs.com/en/guide/using-middleware.html#middleware.router
  */
 
+const { response } = require('express');
 const express = require('express');
 const router  = express.Router();
 
 module.exports = (db) => {
   router.get("/", (req, res) => {
+    
     db.query(`SELECT * FROM users;`)
       .then(data => {
         const users = data.rows;
@@ -21,11 +23,6 @@ module.exports = (db) => {
           .json({ error: err.message });
       });
   });
-
-  router.get("/", (req, res) => {
-    res.render("index")
-  });
-
   router.get("/login/:id", (req, res) => {
     const userId = req.params.id;
     req.session.userId = userId;
