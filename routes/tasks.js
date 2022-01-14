@@ -1,35 +1,42 @@
+/*
+ * All routes for tasks are defined here
+ * See: https://expressjs.com/en/guide/using-middleware.html#middleware.router
+ */
+
 const express = require('express');
-const router = express.Router();
-const { isMovie, isRestaurant, isBook } = require('../helper-functions/find-category');
-
-const addNewTask = function (db, task, category, userId) {
-  console.log(task);
-  db.query(`SELECT id FROM categories where name = $1`, [category])
-    .then(data => {
-
-      db.query(`INSERT INTO tasks (name,category_id,user_id)
-    VALUES($1,$2,$3) `, [task, data.rows[0]['id'], userId]); //need to change user id once we set session cookies.
-    })// data.rows[0]['id']
-
-}
+const router  = express.Router();
+const {addCategory} = require('../categories/taskCategory');
 
 module.exports = (db) => {
+  // POST/tasks/add route:
+  router.post("/add", async (req, res) => {
+    const autoCategory = await addCategory(req.body.task_title, req.body.task_desc);
+    let queryString = `
+      INSERT INTO tasks (task_title, task_description, user_id, status_id)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *;
+    `;
+    let queryParams = [req.body.task_title, req.body.task_desc, req.session.userID, 1];
+    // console.log(queryString, queryParams);
 
-  console.log('connect');
-// delete data
-
-  router.get("/", (req, res) => {
-
-    const userId = req.session.userId;
-    console.log(req.session.userId);
-    db.query(`SELECT t.id, t.name AS task_name,c.name AS category_name FROM tasks AS t
-            JOIN categories AS c ON t.category_id = c.id
-            JOIN users AS u on u.id = t.user_id
-            where t.user_id = $1 AND is_active = TRUE;
-            `, [userId])
-      .then(data => {
-        const tasks = data.rows;
-        res.json( tasks );
+    db.query(queryString, queryParams)
+      .then((data) => {
+        let queryStringAutoCategory = `INSERT INTO task_category 
+        (task_id, category_id) 
+        VALUES ($1, $2)
+        RETURNING *;`;
+        let queryParamsAutoCategory = [data.rows[0].id,autoCategory];
+        // console.log(queryStringAutoCategory, queryParamsAutoCategory);
+        db.query(queryStringAutoCategory, queryParamsAutoCategory)
+        .then((data1) => {          
+          res.redirect('/tasks');
+        })
+        .catch(err => {
+          res
+            .status(500)
+            .json({ error: err.message });
+        });
+        // res.redirect('/');
       })
       .catch(err => {
         res
@@ -38,118 +45,162 @@ module.exports = (db) => {
       });
   });
 
+  // POST /tasks/:id route (DELETE):
+  router.post("/:id", (req, res) => {
+    // console.log(req.params.id);
+    let queryString = `
+      DELETE FROM tasks
+      WHERE id = $1
+      RETURNING *;
+    `;
+    let queryParams = [req.params.id];
+    // console.log(queryString, queryParams);
 
-  //router.get("/", (req, res) => {
-  //  db.query(`SELECT * FROM tasks;`)
-  //    .then(data => {
-  //      const users = data.rows;
-  //      res.json({ users });
-  //    })
-  //    .catch(err => {
-  //      res
-  //        .status(500)
-  //        .json({ error: err.message });
-  //    });
-  //});
-
-  router.post("/new", (req, res) => {
-    const task = req.body.content;
-    const userId = req.session.userId;
-    isMovie(task).then(
-      (movie) => {
-        if (movie['results'] && movie['results'][0] && movie['results'][0].title.toUpperCase() === task.toUpperCase()) {
-          console.log("Category of Task is ---to_watch");
-          addNewTask(db, task, 'to_watch', userId);
-          res.end();
-        } else {
-          return task;
-        }
-      }).then((task) => {
-        if (!task) return;
-        isBook(task).then(({ results }) => {
-          console.log("Book results----" + task);
-          if (results && results[0].title.toUpperCase() === task.toUpperCase()) {
-            console.log("Category of Task is----to_read");
-            addNewTask(db, task, 'to_read', userId);
-            res.end();
-          } else {
-            return task;
-          }
-        }).then((task) => {
-          if (!task) return;
-          isRestaurant(task).then((restaurant) => {
-            console.log("restaurant----" + task);
-            if ((restaurant && restaurant.businesses[0] && restaurant.businesses[0].name.toUpperCase() === task.toUpperCase())) {
-              console.log("Category of Task is ---to_eat");
-              addNewTask(db, task, 'to_eat', userId);
-              res.end();
-            } else {
-              return task;
-            }
-          }).then(task => {
-            if (!task) return;
-            console.log("Category of Task is----to_buy", task);
-            addNewTask(db, task, 'to_buy', userId);
-            res.end();
-          })
-
-        }).catch(err => console.log(err.message))
+    db.query(queryString, queryParams)
+      .then(() => {
+        res.redirect('/');
       })
-
+      .catch(err => {
+        res
+          .status(500)
+          .json({ error: err.message });
+      })
   })
 
-  router.get("/:id", (req, res) => {
-    const userId = req.session.userId;
-    const taskId = req.params.id;
-    const sql = `SELECT t.id, t.name AS task_name, is_done, c.name AS category_name FROM tasks AS t
-    JOIN categories AS c ON t.category_id = c.id
-    JOIN users AS u on u.id = t.user_id
-    where t.id = $1;
-    `
-    db.query(sql, [taskId])//[userId, taskId])//removing for testing purposes we need to set in query  AND t.user_id = $2
-      .then(data => {
-        const tasks = data.rows;
-        res.json(tasks);
-      })
-      .catch(err => {
-        res
-          .status(500)
-          .json({ error: err.message });
-      });
-  });
+  // POST tasks/status/:id route (status update):
+  router.post("/status/:id", (req, res) => {
+    let queryString = `
+      UPDATE tasks
+      SET status_id = 2
+      WHERE id = $1
+      RETURNING *;
+    `;
+    let queryParams = [req.params.id];
 
-  //EDIT ROUTE
-  router.put("/:id", (req, res) => {
-
-    const is_done = typeof (req.body.is_done) === undefined ? false : true;
-    const taskTitle = req.body.taskTitle;
-    const taskId = req.body.taskId;
-    const sql = `UPDATE tasks SET name = $1, is_done = $2 WHERE id = $3`
-    console.log("[Task.js]---Updating a Task");
-    db.query(sql, [taskTitle, is_done, taskId])
-      .then(data => {
-        const tasks = data.rows;
-        res.end();
-      })
-      .catch(err => {
-        res
-          .status(500)
-          .json({ error: err.message });
-      });
-  });
-
-router.delete("/:id",(req,res) => {
-      const task_id = req.params.id;
-      const userId = req.session.userId;
-      db.query(`UPDATE tasks SET is_active = FALSE WHERE id = $1;`,[task_id])
+    db.query(queryString, queryParams)
       .then(() => {
-        res.end();
+        res.json({ success: true});
       })
       .catch(err => {
         res
           .status(500)
           .json({ error: err.message });
-      });
-    });
-  return router;    
-}
+      })
+  });
+
+  // POST tasks/update/:id route (edit task description):
+  router.post("/update/:id", (req, res) => {
+    let data;
+    let queryString = `
+      UPDATE tasks
+    `
+    if (req.body.task_description) {
+      data = req.body.task_description;
+      queryString += `SET task_description = $1`;
+    }
+    if (req.body.task_title) {
+      data = req.body.task_title;
+      queryString += `SET task_title = $1`;
+    }
+
+    queryString += `
+      WHERE id = $2
+      RETURNING *;
+    `
+    let queryParams = [data, req.params.id];
+
+    // console.log(queryString, queryParams);
+    db.query(queryString, queryParams)
+      .then(() => {
+        res.json({ success: true });
+      })
+      .catch(err => {
+        res
+          .status(500)
+          .json({ error: err.message });
+      })
+  });
+
+  // GET/tasks/ redirects to GET/
+  router.get("/", (req,res) => {
+    // if the users is logged in
+    const userID = req.session.userID;
+    if (userID) {
+      res.render("index", req.session);
+      // let queryString = `
+      //   SELECT * FROM tasks
+      //   WHERE user_id = $1;
+      // `
+      // let queryParams = [userID];
+
+      // db.query(queryString, queryParams)
+      //   .then((data) => {
+      //     res.render("index", req.session);
+      //   })
+      //   .catch(err => {
+      //     res
+      //     .status(500)
+      //     .json({ error: err.message });
+      //   })
+    } else {
+      res.redirect('/users/login');
+    }
+  });
+
+  // GET/tasks/categories
+  router.get("/categories", (req,res) => {
+    res.render("categoryView", req.session);
+  });
+
+  // GET/tasks/:categoryName --> Sidebar!
+  router.get("/:categoryName", (req,res) => {
+    res.render(`${req.params.categoryName}`, req.session)
+  })
+
+  // Probably use this for scripts from sidebar
+  router.post("/categories/delete/:id/:categoryId", (req, res) => {
+    let queryString = `
+      DELETE FROM task_category
+      WHERE task_id = $1
+      AND category_id = $2
+      RETURNING *;
+    `;
+    let queryParams = [req.params.id, req.params.categoryId];
+    // console.log(queryString);
+    // console.log(queryParams);
+    db.query(queryString, queryParams)
+      .then(data => {
+        res.redirect('/');
+      })
+      .catch(err => {
+        res
+          .status(500)
+          .json({ error: err.message });
+      })
+  });
+
+  router.post("/categories/add/:id/:categoryId", (req, res) => {
+    let queryString = `
+    INSERT INTO task_category 
+    (task_id, category_id) 
+    VALUES ($1, $2)
+    RETURNING *;
+    `;
+    let queryParams = [req.params.id, req.params.categoryId];
+    console.log(queryString);
+    console.log(queryParams);
+    db.query(queryString, queryParams)
+      .then(data => {
+        res.redirect('/');
+      })
+      .catch(err => {
+        res
+          .status(500)
+          .json({ error: err.message });
+      })
+  });
+
+
+  return router;
+
+};
