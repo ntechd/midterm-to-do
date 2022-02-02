@@ -1,4 +1,4 @@
-const {isBook} = require ('./googleBook');
+const {isBook} = require ('./googleBooks');
 const {isSeries, isMovie} = require ('./omdbMovies');
 const {isRestoCafe} = require('./yelpRestCafe');
 const googleKnowledge = require ('./googleKnowledge');
