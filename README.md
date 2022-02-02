@@ -50,17 +50,18 @@ The following steps are only for _one_ of the group members to perform.
 
 username: example@example.com
 password: password
+Or visit http://localhost:8080/register to register for an account
 
 ## Screenshots of the app running
 
 The main page where you can see an overview of your tasks
-!["the main page where you can see your tasks"](https://github.com/KwekuDar/scheduler/blob/master/docs/main_page.png?raw=true)
+!["the main page where you can see your tasks"](https://github.com/ntechd/midterm-to-do/blob/master/docs/main.png?raw=true)
 
 Deleting a task
-!["deleting an appointment"](https://github.com/KwekuDar/scheduler/blob/master/docs/deleting_appointment.png?raw=true)
+!["deleting a task"](https://github.com/ntechd/midterm-to-do/blob/master/docs/delete.png?raw=true)
 
-Editing a task
-!["user must enter a name before booking an appointment"](https://github.com/KwekuDar/scheduler/blob/master/docs/select_interviewer.png?raw=true)
+Editing the gategory of a task in case it is miscategorized
+!["editing the category of a task"](https://github.com/ntechd/midterm-to-do/blob/master/docs/edit_category.png?raw=true)
 
 Tasks by categories
-!["user must select an interviewer before booking an appointment"](https://github.com/KwekuDar/scheduler/blob/master/docs/interviewer_not_selected.png?raw=true)
+!["taks are displayed by category"](https://github.com/ntechd/midterm-to-do/blob/master/docs/by_category.png?raw=true)
