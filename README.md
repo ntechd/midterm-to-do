@@ -63,5 +63,5 @@ Deleting a task
 Editing the gategory of a task in case it is miscategorized
 !["editing the category of a task"](https://github.com/ntechd/midterm-to-do/blob/master/docs/edit_category.png?raw=true)
 
-Tasks by categories
+Tasks by category
 !["taks are displayed by category"](https://github.com/ntechd/midterm-to-do/blob/master/docs/by_category.png?raw=true)
